@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#f5f6f1">
+  <title>Entrar · MoneyWise</title>
+  <link rel="icon" href="{{ url_for('static',filename='icon.svg') }}" type="image/svg+xml">
+  <script>try{if(localStorage.getItem('moneywise-theme')==='dark')document.documentElement.classList.add('dark-start')}catch(e){}</script>
+  <link rel="stylesheet" href="{{ url_for('static',filename='css/style.css') }}?v=3">
+  <style>
+    .login-shell{min-height:100dvh;display:grid;place-items:center;padding:24px}
+    .login-card{width:100%;max-width:410px;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:34px 30px;box-shadow:var(--shadow)}
+    .login-card .brand{margin-bottom:22px}
+    .login-card h1{font-size:26px;letter-spacing:-1px;margin-bottom:8px}
+    .login-card .sub{color:var(--muted);font-size:12px;margin-bottom:22px}
+    .login-error{background:#fff0e5;color:#9d4b2b;border:1px solid #f0cbb5;padding:11px 13px;border-radius:9px;font-size:12px;margin-bottom:16px}
+    .dark .login-error{background:#3a231c;color:#f3b59b;border-color:#5c372c}
+    .login-card .primary{width:100%;margin-top:8px}
+    .login-foot{margin-top:20px;padding-top:16px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--muted)}
+  </style>
+</head>
+<body>
+  <div class="login-shell">
+    <form class="login-card" method="post" action="/login">
+      <div class="brand"><span class="brand-mark">m<span>↗</span></span><span class="brand-name">moneywise<span class="brand-dot">.</span></span></div>
+      <h1>Bem-vindo de volta<span>.</span></h1>
+      <p class="sub">Entre para acessar seus registros e metas de qualquer lugar.</p>
+      {% if error %}
+        <div class="login-error" role="alert">{{ error }}</div>
+      {% endif %}
+      <label>Usuário
+        <input name="username" type="text" autocomplete="username" placeholder="Digite seu usuário" required autofocus>
+      </label>
+      <label>Senha
+        <input name="password" type="password" autocomplete="current-password" placeholder="••••••••" required>
+      </label>
+      <button class="primary" type="submit">Entrar no MoneyWise ↗</button>
+      <div class="login-foot">
+        <span>Acesso restrito · 2 perfis</span>
+        <button type="button" id="login-theme" class="text-button">◐ Tema</button>
+      </div>
+    </form>
+  </div>
+  <script>
+    const isDark = localStorage.getItem('moneywise-theme') === 'dark';
+    document.body.classList.toggle('dark', isDark);
+    document.documentElement.classList.remove('dark-start');
+    document.getElementById('login-theme').onclick = () => {
+      document.body.classList.toggle('dark');
+      localStorage.setItem('moneywise-theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+    };
+  </script>
+</body>
+</html>

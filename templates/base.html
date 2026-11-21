@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#f5f6f1">
+  <meta name="description" content="Organize suas finanças, acompanhe metas e converse com seu assistente local.">
+  <title>MoneyWise · Seu dinheiro, com mais clareza</title>
+  <link rel="icon" href="{{ url_for('static',filename='icon.svg') }}" type="image/svg+xml">
+  <script>try{if(localStorage.getItem('moneywise-theme')==='dark')document.documentElement.classList.add('dark-start')}catch(e){}</script>
+  <link rel="stylesheet" href="{{ url_for('static',filename='css/style.css') }}?v=2">
+  <script src="{{ url_for('static',filename='js/main.js') }}?v=2" defer></script>
+</head>
+<body data-section="{{ section }}">
+  <a class="skip-link" href="#content">Pular para o conteúdo</a>
+  <aside class="sidebar">
+    <a class="brand" href="/" aria-label="MoneyWise, início"><span class="brand-mark">m<span>↗</span></span><span class="brand-name">moneywise<span class="brand-dot">.</span></span></a>
+    <div class="workspace"><span class="avatar">M</span><div>{{ session.get("display_name", "Meu espaço") }}<small>@{{ session.get("username", "usuario") }}</small></div><span class="workspace-dot"></span></div>
+    <p class="nav-label">ORGANIZE SEU FUTURO</p>
+    <nav aria-label="Menu principal">
+      {% for path,icon,title in [('dashboard','◫','Visão geral'),('transacoes','⇄','Transações'),('metas','◎','Minhas metas'),('relatorios','▥','Relatórios'),('assistente','✦','Assistente IA'),('simulador','⌁','Simulador'),('planos','◇','Planos')] %}
+      <a href="{{ '/' if path == 'dashboard' else '/' + path }}" aria-label="{{ title }}" title="{{ title }}" {% if section == path %}aria-current="page"{% endif %} class="{{ 'active' if section == path else '' }}"><span aria-hidden="true">{{ icon }}</span><span class="nav-title">{{ title }}</span>{% if path == 'assistente' %}<b>LOCAL</b>{% endif %}</a>
+      {% endfor %}
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="future-card"><span class="future-star">✳</span><h3>Pequenos passos.<br>Novas possibilidades.</h3><p>O seu próximo objetivo merece um plano.</p><a href="/metas">Criar uma meta <span>↗</span></a></div>
+      <button id="theme" class="theme-button" aria-label="Alternar tema claro e escuro">◐ <span>Alternar tema</span></button>
+      <div class="profile"><span class="avatar">{{ (session.get("display_name", "MW")[:2]).upper() }}</span><div>{{ session.get("display_name", "Minha conta") }}<small id="plan-badge">Carregando plano…</small></div><a href="/logout" class="profile-demo" title="Trocar usuário ou sair" style="color:var(--green);font-weight:650">SAIR ↗</a></div>
+    </div>
+  </aside>
+  <main id="content">
+    <header class="topbar"><span>Meu espaço <span class="slash">/</span> <strong id="breadcrumb">Visão geral</strong></span><div><time id="today-label"></time><a href="/logout" class="demo-label" title="Sair da conta"><span class="live-dot"></span> {{ session.get("display_name", "Conta") }} · Sair</a><button id="mobile-theme" class="mobile-theme" aria-label="Alternar tema">◐</button><span class="avatar small">MW</span></div></header>
+    {% block content %}{% endblock %}
+    <footer><span class="footer-brand">moneywise.</span><span>Um passo de cada vez. Um futuro mais seu.</span><span>Feito para o seu próximo passo ↗</span></footer>
+  </main>
+  <div id="toast" role="status" aria-live="polite"></div>
+  <noscript><div class="noscript">Ative o JavaScript no navegador para usar os formulários e carregar seus dados.</div></noscript>
+    <dialog id="transaction-dialog">
+      <form id="transaction-form">
+        <div class="dialog-heading">
+          <h2 id="transaction-title">Novo lançamento</h2><button type="button" data-close="transaction-dialog" aria-label="Fechar">×</button>
+        </div>
+        <input name="id" type="hidden"><label>Descrição<input name="description" required maxlength="120" placeholder="Ex.: Compras da semana"></label>
+        <div class="form-grid">
+          <label>Valor (R$)<input name="amount" type="number" min="0.01" max="100000000" step="0.01" required></label><label>Tipo<select name="type"><option value="despesa">Despesa</option><option value="receita">Receita</option></select></label><label>Categoria<select name="category">
+          {% for category in categories %}
+            <option>{{ category }}</option>
+          {% endfor %}
+          </select></label><label>Data<input name="date" type="date" required></label>
+        </div>
+        <button type="button" id="add-category" class="text-button">＋ Criar categoria (Plus)</button><button class="primary" type="submit">Salvar lançamento ↗</button>
+      </form>
+    </dialog>
+
+    {# Formulário das metas; o valor guardado não altera o saldo. #}
+    <dialog id="goal-dialog">
+      <form id="goal-form">
+        <div class="dialog-heading">
+          <h2>Minha meta</h2><button type="button" data-close="goal-dialog" aria-label="Fechar">×</button>
+        </div>
+        <input name="id" type="hidden"><label>Nome<input name="name" maxlength="120" required></label>
+        <div class="form-grid">
+          <label>Objetivo (R$)<input name="target" type="number" min="0.01" step="0.01" max="100000000" required></label><label>Já guardado (R$)<input name="saved" type="number" min="0" step="0.01" max="100000000" required></label>
+        </div>
+        <label>Prazo<input name="deadline" type="date" required></label><p class="muted">O valor guardado é informativo e não altera o saldo da conta.</p><button class="primary">Salvar meta ↗</button>
+      </form>
+    </dialog>
+  </body>
+</html>

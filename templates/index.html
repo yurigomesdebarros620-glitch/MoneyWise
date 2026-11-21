@@ -1,0 +1,205 @@
+{% extends 'base.html' %}
+{% block content %}
+  <div class="page">
+    <section class="page-heading">
+      <div>
+        <p class="eyebrow">SEU PRÓXIMO PASSO COMEÇA AQUI</p><h1 id="page-title">Seu futuro está no controle<span>.</span></h1><p id="page-subtitle">Cada escolha de hoje aproxima você de onde quer chegar.</p>
+      </div>
+      <button class="primary new-transaction">＋ Novo lançamento</button>
+    </section>
+
+    {# Resumo do saldo e gráfico das movimentações do mês. #}
+    <section data-view="dashboard">
+      <div class="stats">
+        <article class="balance-card">
+          <div class="card-label">
+            Saldo total <span>↗</span>
+          </div>
+          <strong id="balance">—</strong><p><span class="pill">Seu saldo até hoje</span> <span>Saldo acumulado</span></p>
+          <div class="balance-decoration">
+          </div>
+        </article>
+        <article class="stat-card">
+          <div class="card-label">
+            Receitas do mês <span class="icon-circle green">↙</span>
+          </div>
+          <strong id="income">—</strong><p><span class="green-text">Entradas</span> <span>até hoje</span></p>
+        </article>
+        <article class="stat-card">
+          <div class="card-label">
+            Despesas do mês <span class="icon-circle orange">↗</span>
+          </div>
+          <strong id="expense">—</strong><p><span class="orange-text">Saídas</span> <span>até hoje</span></p>
+        </article>
+      </div>
+      <div class="dashboard-grid">
+        <article class="panel cashflow">
+          <div class="panel-heading">
+            <div>
+              <h2>Seu dinheiro em movimento</h2><p>Pequenos hábitos. Grandes mudanças.</p>
+            </div>
+            <span class="period">Últimos 6 meses</span>
+          </div>
+          <div class="chart-key">
+            <span>● Receitas</span><span>● Despesas</span>
+          </div>
+          <div class="chart-wrap">
+            <div id="cash-chart" class="local-chart" aria-label="Receitas e despesas nos últimos seis meses"></div>
+          </div>
+          <p class="chart-fallback" hidden>O gráfico não carregou. Os totais estão disponíveis acima.</p>
+        </article>
+        <article class="month-focus">
+          <span class="focus-label">SEU MÊS EM FOCO <span>↗</span></span>
+          <div class="focus-orbit" aria-hidden="true"><span>✳</span></div>
+          <h2>Cada escolha<br>faz diferença.</h2>
+          <p id="month-insight">Carregando seu resumo do mês…</p>
+          <div class="month-meter"><span id="month-progress"></span></div>
+          <div class="focus-foot"><span>Despesas / receitas</span><strong id="saving-rate">—</strong></div>
+          <a href="/assistente">Conversar sobre meu dinheiro <span>↗</span></a>
+        </article>
+      </div>
+    </section>
+
+    {# Área em que o JavaScript insere os cartões das metas. #}
+    <section data-view="dashboard metas">
+      <div class="section-heading">
+        <div>
+          <h2>Planos que viram realidade <span>✦</span></h2><p>Dê um nome ao seu próximo passo.</p>
+        </div>
+        <button class="text-button" id="new-goal">＋ Nova meta</button>
+      </div>
+      <div id="goals" class="goals-grid"></div>
+      <div class="routine-card" data-view="dashboard"><span class="routine-icon">↗</span><div><strong>7 dias para um novo hábito.</strong><p>Um pequeno desafio por dia para cuidar do seu dinheiro.</p></div><button id="challenge-start" class="text-button">Começar meu desafio ↗</button></div>
+    </section>
+
+    {# Filtros e tabela preenchidos com os lançamentos salvos. #}
+    <section data-view="dashboard transacoes">
+      <article class="panel transactions-panel">
+        <div class="panel-heading">
+          <div>
+            <h2>Últimas movimentações</h2><p>Seu dia a dia, em detalhes.</p>
+          </div>
+          <a href="/transacoes" class="text-button">Ver todas ↗</a>
+        </div>
+        <div class="filters">
+          <input id="search" placeholder="Buscar uma movimentação…" aria-label="Buscar transações"><select id="category-filter" aria-label="Filtrar categoria"><option value="">Todas as categorias</option>
+          {% for category in categories %}
+            <option>{{ category }}</option>
+          {% endfor %}
+          </select><select id="type-filter" aria-label="Filtrar tipo"><option value="">Todos os tipos</option><option value="receita">Receitas</option><option value="despesa">Despesas</option></select>
+        </div>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Descrição</th><th>Categoria</th><th>Data</th><th>Valor</th><th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="transactions">
+            </tbody>
+          </table>
+        </div>
+        <p id="table-count" class="muted"></p>
+      </article>
+    </section>
+
+    {# Relatório de despesas por categoria e conversa com a IA local. #}
+    <section data-view="dashboard relatorios assistente">
+      <div class="report-grid">
+        <article class="panel">
+          <div class="panel-heading">
+            <div>
+              <h2>Onde seu dinheiro vai</h2><p>Distribuição das despesas deste mês.</p>
+            </div>
+            <span class="mini-label">PLUS</span>
+          </div>
+          <div id="report-lock">
+          </div>
+          <div class="donut-wrap">
+            <div id="category-chart" class="local-chart" aria-label="Despesas por categoria"></div>
+          </div>
+          <div id="category-list">
+          </div>
+        </article>
+
+        {# Chat com opção de autorizar a consulta às receitas, despesas e metas. #}
+        <article class="panel assistant">
+          <div class="panel-heading">
+            <div>
+              <h2><span class="spark">✦</span> Seu aliado financeiro</h2><p>Clareza para decidir. Um passo de cada vez.</p>
+            </div>
+            <span class="mini-label">IA LOCAL</span>
+          </div>
+          <div id="ai-health" class="ai-health" role="status">Verificando IA local…</div><button type="button" id="ai-check" class="text-button">Verificar conexão ↻</button><div id="chat-log" role="log" aria-live="polite" aria-relevant="additions">
+            <p class="chat-message">Olá! Vamos entender melhor seu dinheiro? Posso consultar seu saldo, organizar suas metas ou ajudar você a pensar no próximo passo.</p>
+          </div>
+          <div class="suggestions">
+            <button data-question="Resumo do mês">Meu resumo ↗</button><button data-question="Quanto gastei neste mês?">Gastos do mês ↗</button><button data-question="Como alcançar minhas metas?">Minhas metas ↗</button>
+          </div>
+          <label class="chat-context"><input type="checkbox" id="chat-context" checked> Usar meus dados salvos (receitas, despesas e metas)</label>
+          <div class="chat-toolbar">
+            <span id="chat-status" role="status"></span><div class="chat-actions"><button type="button" id="chat-retry" class="text-button" hidden>Tentar novamente ↻</button><button type="button" id="chat-clear" class="text-button">Nova conversa</button></div>
+          </div>
+          <form id="chat-form">
+            <input id="chat-input" maxlength="2000" placeholder="O que você quer entender?" required aria-label="Mensagem ao assistente" autocomplete="off"><button type="submit" aria-label="Enviar mensagem">↑</button><button type="button" id="chat-stop" aria-label="Parar resposta" hidden>■</button>
+          </form>
+          <small>Só neste computador. Consultas aos registros usam valores calculados pelo sistema; sugestões da IA podem conter erros.</small>
+        </article>
+      </div>
+    </section>
+
+    {# Entradas da simulação e espaço para exibir o resultado. #}
+    <section data-view="simulador">
+      <div class="sim-grid">
+        <article class="panel">
+          <h2>Imagine seu próximo capítulo.</h2><p class="muted">Veja o efeito de guardar um pouco todos os meses.</p>
+          <form id="simulation-form">
+            <label>Valor inicial (R$)<input name="initial" type="number" min="0" max="100000000" step="0.01" value="1000" required></label><label>Quanto guardar por mês (R$)<input name="monthly" type="number" min="0" max="100000000" step="0.01" value="100" required></label>
+            <div class="form-grid">
+              <label>Prazo em meses<input name="months" type="number" min="1" max="600" value="12" required></label><label>Rendimento mensal (%)<input name="rate" type="number" min="0" max="10" step="0.01" value="1" required></label>
+            </div>
+            <button class="primary">Simular meu futuro ↗</button>
+          </form>
+          <p class="muted">Aportes no fim de cada mês. Taxa constante, sem impostos, tarifas ou inflação. Projeção ilustrativa, sem garantia de retorno. Use taxa zero para simular apenas cortes de gastos.</p>
+        </article>
+        <article class="panel">
+          <p class="eyebrow">O TEMPO TAMBÉM INVESTE EM VOCÊ</p><h2 id="simulation-total">Seu próximo passo, em números.</h2><p id="simulation-details" class="muted"></p>
+          <div class="chart-wrap">
+            <div id="simulation-chart" class="local-chart" aria-label="Projeção de saldo"></div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    {# O laço monta os cartões e benefícios de cada plano. #}
+    <section data-view="planos">
+      <p class="demo-notice">Experimente cada plano. A seleção é uma simulação: não há cobrança nem assinatura real.</p>
+      <div class="plans-grid">
+        {% for key,name,price,features in [('free','Free','0',['Controle de receitas e despesas','Categorias básicas','Criação de 1 meta']),('plus','Plus','9,90',['Tudo do Free','Relatórios por categoria','Categorias personalizadas ilimitadas','Acompanhamento de múltiplas metas']),('premium','Premium','19,90',['Tudo do Plus','Assistente local disponível em todos os planos','Análises baseadas nos seus gastos','Simulações financeiras'])] %}
+          <article class="panel plan-card {{ 'featured' if key == 'premium' else '' }}">
+            <span class="mini-label">{{ 'SUA MELHOR VERSÃO' if key == 'premium' else 'DO SEU JEITO' }}</span><h2>MoneyWise {{ name }}</h2>
+            <div class="price">
+              <span>R$</span> {{ price }}<small>/mês</small>
+            </div>
+            <ul>
+              {% for feature in features %}
+                <li>✓ {{ feature }}</li>
+              {% endfor %}
+            </ul>
+            <button class="primary choose-plan" data-plan="{{ key }}">Experimentar {{ name }}</button>
+          </article>
+        {% endfor %}
+      </div>
+    </section>
+  </div>
+
+  {# Desafio de sete dias com progresso salvo no navegador. #}
+  <dialog id="challenge-dialog">
+    <div class="dialog-heading">
+      <h2>7 dias no controle</h2><button data-close="challenge-dialog" aria-label="Fechar">×</button>
+    </div>
+    <p class="muted">Marque cada passo concluído. Seu progresso fica salvo neste navegador.</p>
+    <div id="challenge-days">
+    </div>
+  </dialog>
+{% endblock %}
